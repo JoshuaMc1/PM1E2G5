@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -72,19 +73,38 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveContact(){
         requestQueue = Volley.newRequestQueue(getApplicationContext());
-        JSONObject contacts;
         HashMap<String, String> parametros = new HashMap<>();
         parametros.put("nombre", txtNombre.getText().toString());
         parametros.put("telefono", txtTelefono.getText().toString());
         parametros.put("latitude", txtLatitud.getText().toString());
         parametros.put("longitude", txtLongitud.getText().toString());
         parametros.put("firma", convertToBase64());
-        contacts = new JSONObject(parametros);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Configuration.Endpoint_create_contact, contacts,
-                this::onResponseCreateContacts,
-                this::onErrorResponseCreateContacts);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Configuration.Endpoint_create_contact,
+                new JSONObject(parametros), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    Toast.makeText(getApplicationContext(), "String Response " + response.getString("Message").toString(), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
         requestQueue.add(jsonObjectRequest);
+        cleanFields();
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Configuration.Endpoint_create_contact, contacts,
+//                this::onResponseCreateContacts,
+//                this::onErrorResponseCreateContacts);
+//        requestQueue.add(jsonObjectRequest);
     }
 
     private String convertToBase64(){
@@ -166,22 +186,18 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
 
-    private void onResponseCreateContacts(JSONObject response) {
-        try {
-            JSONArray resp = new JSONArray(response);
-            if (resp.length() > 0) {
-                for (int i = 0; i < resp.length(); i++) {
-                    JSONObject data = resp.getJSONObject(i);
-                    String message = "Code => " + data.getString("Code") + "\nMessage => " +
-                            data.getString("Message");
-                    message(message);
-                }
-            } else message("No hubo respuesta.");
-        } catch (JSONException e) {
-            message("Error 1: " + e.getMessage());
-        }
-        cleanFields();
-    }
+
+//    private void onResponseCreateContacts(JSONObject response) {
+//        try {
+//            JSONArray resp = new JSONArray(response);
+//            if (resp.length() > 0) {
+//
+//            } else message("No hubo respuesta.");
+//        } catch (JSONException e) {
+//            message("Error 1: " + e.getMessage());
+//        }
+//        cleanFields();
+//    }
 
     private void onErrorResponseCreateContacts(VolleyError error) {
         message("Error 2: " + error.getMessage());
