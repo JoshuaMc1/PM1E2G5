@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Examen 2P</string>
+    <string name="firma_digital">FIRMA DIGITAL</string>
+    <string name="nombre">Nombre</string>
+    <string name="telefono">Telefono</string>
+    <string name="latitud">Latitud</string>
+    <string name="longitud">Longitud</string>
+    <string name="gps">GPS</string>
+    <string name="guardar_contacto">Guardar contacto</string>
+    <string name="contactos_guardados">Contactos guardados</string>
+</resources>
