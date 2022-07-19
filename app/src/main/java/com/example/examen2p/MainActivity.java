@@ -5,11 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -56,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onClickGoScreen2(View view) {
-
+        Intent ventana = new Intent(getApplicationContext(), ActivityLista.class);
+        startActivity(ventana);
+        finish();
     }
 
     private void onClickSaveContact(View view) {
@@ -73,38 +77,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveContact(){
         requestQueue = Volley.newRequestQueue(getApplicationContext());
+        JSONObject objeto;
         HashMap<String, String> parametros = new HashMap<>();
         parametros.put("nombre", txtNombre.getText().toString());
         parametros.put("telefono", txtTelefono.getText().toString());
-        parametros.put("latitude", txtLatitud.getText().toString());
         parametros.put("longitude", txtLongitud.getText().toString());
+        parametros.put("latitude", txtLatitud.getText().toString());
         parametros.put("firma", convertToBase64());
+        objeto = new JSONObject(parametros);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Configuration.Endpoint_create_contact,
-                new JSONObject(parametros), new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    Toast.makeText(getApplicationContext(), "String Response " + response.getString("Message").toString(), Toast.LENGTH_SHORT).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Configuration.Endpoint_create_contact, objeto,
+                this::onResponseCreateContacts,
+                this::onErrorResponseCreateContacts);
         requestQueue.add(jsonObjectRequest);
-        cleanFields();
-//
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Configuration.Endpoint_create_contact, contacts,
-//                this::onResponseCreateContacts,
-//                this::onErrorResponseCreateContacts);
-//        requestQueue.add(jsonObjectRequest);
     }
 
     private String convertToBase64(){
@@ -179,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateEmptyFields(EditText object){
-        return object.length() > 0 ? true : false;
+        return object.length() > 0;
     }
 
     public void message(String msg){
@@ -187,17 +172,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    private void onResponseCreateContacts(JSONObject response) {
-//        try {
-//            JSONArray resp = new JSONArray(response);
-//            if (resp.length() > 0) {
-//
-//            } else message("No hubo respuesta.");
-//        } catch (JSONException e) {
-//            message("Error 1: " + e.getMessage());
-//        }
-//        cleanFields();
-//    }
+    private void onResponseCreateContacts(JSONObject response) {
+        try {
+            if (response.length() > 0) {
+                message("Code => " + response.getString("Code") + "\nMeesage => " + response.getString("Message"));
+            } else message("No hubo respuesta.");
+        } catch (JSONException ex) {
+            message("Error 1: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        cleanFields();
+    }
 
     private void onErrorResponseCreateContacts(VolleyError error) {
         message("Error 2: " + error.getMessage());

@@ -2,8 +2,8 @@ package com.example.examen2p.Configuration;
 
 public class Configuration {
     private static final String Server_http = "https://";
-    private static final String Server_direction = "pm1e2g5.000webhostapp.com/";
-    private static final String Web_api = "Api_Examen/";
+    private static final String Server_direction = "educationsofthn.com/";
+    private static final String Web_api = "API_G5/";
     private static final String Get_all_contacts = "api/read.php";
     private static final String Get_single_contact = "api/single_read.php";
     private static final String Create_contact = "api/create.php";
