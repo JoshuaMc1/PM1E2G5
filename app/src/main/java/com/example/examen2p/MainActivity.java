@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     EditText txtNombre, txtTelefono, txtLongitud, txtLatitud;
     CaptureBitmap firma;
     private RequestQueue requestQueue;
+    String nuevaVariable = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
